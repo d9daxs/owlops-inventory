@@ -24,9 +24,10 @@
 
   header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
   .brand{display:flex;align-items:center;gap:14px}
-  .logo{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#13243f,#0c1830);
-    border:1px solid var(--line);display:grid;place-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .logo{width:46px;height:46px;border-radius:13px;background:#fff;overflow:hidden;
+    border:1px solid var(--line);display:grid;place-items:center}
   .logo svg{width:24px;height:24px}
+  .logo img{width:100%;height:100%;object-fit:contain;padding:6px}
   .brand .eyebrow{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:600}
   .brand h1{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
   .hright{display:flex;align-items:center;gap:12px}
@@ -193,12 +194,9 @@
   <header>
     <div class="brand">
       <div class="logo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#38e8b0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 8V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/>
-        </svg>
+        <img src="data:image/png;base64,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" alt="Logo"/>
       </div>
       <div>
-        <div class="eyebrow">OWLOPS · PUBLIC API · V1</div>
         <h1>Inventory Control</h1>
       </div>
     </div>
@@ -261,10 +259,6 @@
     </div>
   </div>
 
-  <div class="sub-note">
-    Calls <code>GET /v1/inventory</code> and <code>GET /v1/inventory/{id}</code> on the OwlOps Public API ·
-    auth via <code>X-Api-Key</code> · runs entirely in your browser
-  </div>
 </div>
 
 <div class="scrim" id="modalScrim" onclick="if(event.target===this)closeModal()">
