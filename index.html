@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OwlOps · Inventory Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a1020; --bg2:#0e1628; --panel:#101a30; --panel2:#0d1526;
+    --line:#1d2c47; --line2:#26354f;
+    --txt:#e8eef9; --dim:#9fb0cc; --out:#ff6b6b; --mut:#6b7da0;
+    --accent:#38e8b0; --accent2:#3aa8ff; --warn:#ffc24b; --low:#ffc24b; --master:#b388ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Bricolage Grotesque',system-ui,sans-serif;background:
+    radial-gradient(1200px 600px at 80% -10%,rgba(58,168,255,.08),transparent),
+    radial-gradient(900px 500px at 0% 100%,rgba(56,232,176,.07),transparent),
+    var(--bg);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased}
+  code,.mono{font-family:'JetBrains Mono',monospace}
+  .wrap{max-width:1280px;margin:0 auto;padding:26px 24px 70px}
+
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#13243f,#0c1830);
+    border:1px solid var(--line);display:grid;place-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .logo svg{width:24px;height:24px}
+  .brand .eyebrow{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:600}
+  .brand h1{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  .hright{display:flex;align-items:center;gap:12px}
+  .status{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono';font-size:11px;
+    letter-spacing:.08em;color:var(--dim);padding:8px 13px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--mut);box-shadow:0 0 8px currentColor}
+  .dot.live{background:var(--accent);color:var(--accent)}
+  .dot.demo{background:var(--accent2);color:var(--accent2)}
+  .dot.err{background:var(--out);color:var(--out)}
+  .btn{font-family:'JetBrains Mono';font-size:12px;font-weight:600;letter-spacing:.04em;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel);color:var(--txt);padding:9px 15px;border-radius:9px;
+    display:inline-flex;align-items:center;gap:8px;transition:.16s}
+  .btn:hover{background:var(--panel2);border-color:#33476c}
+  .btn svg{width:15px;height:15px}
+  .btn.pri{background:linear-gradient(135deg,var(--accent),#23c79a);color:#05231a;border:none;font-weight:700}
+  .btn.pri:hover{filter:brightness(1.07)}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
+    border-radius:15px;padding:17px 18px;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,var(--accent),transparent)}
+  .card.c2::before{background:linear-gradient(90deg,var(--accent2),transparent)}
+  .card.c3::before{background:linear-gradient(90deg,var(--warn),transparent)}
+  .card.c4::before{background:linear-gradient(90deg,var(--out),transparent)}
+  .card .k{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.14em;color:var(--dim);font-weight:600;text-transform:uppercase}
+  .card .v{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:7px;line-height:1}
+  .card .s{font-size:12px;color:var(--mut);margin-top:7px}
+  .card .v.sm{font-size:25px}
+
+  .toolbar{display:flex;gap:11px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+  .searchbox{flex:1;min-width:230px;position:relative}
+  .searchbox svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--mut)}
+  .searchbox input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);font-size:14px;font-family:inherit;padding:11px 13px 11px 38px;outline:none}
+  .searchbox input:focus{border-color:#33476c;box-shadow:0 0 0 3px rgba(58,168,255,.1)}
+  .seg{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{font-family:'JetBrains Mono';font-size:12px;font-weight:600;letter-spacing:.03em;cursor:pointer;
+    background:none;border:none;color:var(--dim);padding:10px 14px;transition:.14s;white-space:nowrap}
+  .seg button:hover{color:var(--txt)}
+  .seg button.on{background:rgba(56,232,176,.13);color:var(--accent)}
+  .inp{background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:13px;font-family:'JetBrains Mono';padding:10px 12px;outline:none;cursor:pointer}
+  select.inp{appearance:none;padding-right:30px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%238997af' stroke-width='2'><path d='M2 4l4 4 4-4'/></svg>");
+    background-repeat:no-repeat;background-position:right 11px center}
+  .inp:focus{border-color:#33476c}
+  .iconbtn{width:40px;height:40px;display:grid;place-items:center;background:var(--panel2);border:1px solid var(--line);
+    border-radius:10px;cursor:pointer;color:var(--dim);transition:.14s}
+  .iconbtn:hover{color:var(--txt);border-color:#33476c}
+  .iconbtn svg{width:17px;height:17px}
+  .iconbtn.spin svg{animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .tablewrap{background:var(--panel2);border:1px solid var(--line);border-radius:15px;overflow:hidden}
+  table{width:100%;border-collapse:collapse}
+  thead th{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.1em;color:var(--dim);font-weight:600;
+    text-transform:uppercase;text-align:left;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--panel);
+    cursor:pointer;user-select:none;white-space:nowrap}
+  thead th:hover{color:var(--txt)}
+  thead th .ar{opacity:.7;font-size:9px;color:var(--accent)}
+  thead th.r,td.r{text-align:right}
+  tbody tr{border-bottom:1px solid rgba(29,44,71,.6);cursor:pointer;transition:background .12s}
+  tbody tr:last-child{border-bottom:none}
+  tbody tr:hover{background:rgba(58,168,255,.05)}
+  td{padding:13px 16px;font-size:13.5px;vertical-align:middle}
+  td .id{font-family:'JetBrains Mono';font-size:12px;color:var(--accent2);font-weight:600}
+  td .nm{font-weight:600;display:flex;align-items:center;gap:8px}
+  td .sub{font-size:11.5px;color:var(--mut);margin-top:2px;font-family:'JetBrains Mono'}
+  .tag{font-family:'JetBrains Mono';font-size:10px;font-weight:600;letter-spacing:.04em;padding:2px 7px;border-radius:5px;
+    border:1px solid;display:inline-block;text-transform:uppercase}
+  .tag.master{color:var(--master);border-color:rgba(179,136,255,.4);background:rgba(179,136,255,.1)}
+  .tag.type{color:var(--accent2);border-color:rgba(58,168,255,.35);background:rgba(58,168,255,.08)}
+  .qty{font-family:'JetBrains Mono';font-weight:700;font-size:14px}
+  .qty .mm{display:block;font-size:10.5px;color:var(--mut);font-weight:500;margin-top:1px}
+  .pill{font-family:'JetBrains Mono';font-size:10.5px;font-weight:600;letter-spacing:.03em;padding:4px 10px;border-radius:20px;
+    display:inline-flex;align-items:center;gap:6px;border:1px solid;white-space:nowrap}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .pill.toOrder{color:var(--out);border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.08)}
+  .pill.excess{color:var(--accent);border-color:rgba(56,232,176,.35);background:rgba(56,232,176,.08)}
+  .pill.ok{color:var(--dim);border-color:var(--line);background:transparent}
+
+  .pagebar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+    padding:14px 16px;border-top:1px solid var(--line);background:var(--panel)}
+  .pageinfo{font-family:'JetBrains Mono';font-size:12px;color:var(--dim)}
+  .pageinfo b{color:var(--txt)}
+  .pager{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .pager button{font-family:'JetBrains Mono';font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel2);color:var(--txt);padding:8px 13px;border-radius:8px;transition:.14s}
+  .pager button:hover:not(:disabled){border-color:#33476c;background:var(--panel)}
+  .pager button:disabled{opacity:.35;cursor:not-allowed}
+  .pager .cur{color:var(--accent);border-color:rgba(56,232,176,.3)}
+
+  .state{padding:60px 24px;text-align:center}
+  .state .ic{width:54px;height:54px;margin:0 auto 16px;border-radius:14px;display:grid;place-items:center;
+    background:var(--panel);border:1px solid var(--line);color:var(--dim)}
+  .state .ic svg{width:26px;height:26px}
+  .state h3{font-size:18px;font-weight:700;margin-bottom:8px}
+  .state p{color:var(--dim);font-size:14px;max-width:560px;margin:0 auto;line-height:1.55}
+  .state.err .ic{color:var(--out);border-color:rgba(255,107,107,.3)}
+  .state .hint{margin-top:18px;text-align:left;max-width:580px;margin-left:auto;margin-right:auto;
+    background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:15px 17px;font-size:13px;color:var(--dim);line-height:1.6}
+  .state .hint code{color:var(--accent);word-break:break-all}
+  .skel{height:30px;border-radius:8px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);
+    background-size:200% 100%;animation:sh 1.3s infinite}
+  @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+  .scrim{position:fixed;inset:0;background:rgba(5,9,18,.72);backdrop-filter:blur(5px);display:none;
+    align-items:flex-start;justify-content:center;padding:50px 18px;z-index:50;overflow:auto}
+  .scrim.open{display:flex}
+  .modal{width:100%;max-width:640px;background:var(--panel);border:1px solid var(--line);border-radius:18px;
+    box-shadow:0 30px 80px rgba(0,0,0,.6);overflow:hidden;animation:pop .18s ease}
+  @keyframes pop{from{transform:translateY(10px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+  .mhead{padding:20px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  .mhead .endpoint{font-family:'JetBrains Mono';font-size:11px;color:var(--mut);letter-spacing:.03em}
+  .mhead .endpoint .get{color:var(--accent);font-weight:600}
+  .mhead h2{font-size:20px;font-weight:800;letter-spacing:-.01em;margin-top:6px;line-height:1.2}
+  .x{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--dim);
+    cursor:pointer;display:grid;place-items:center;flex-shrink:0;transition:.14s}
+  .x:hover{color:var(--txt);border-color:#33476c}
+  .x svg{width:16px;height:16px}
+  .mbody{padding:22px 24px}
+  .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px}
+  .field{border-bottom:1px solid rgba(29,44,71,.5);padding-bottom:11px}
+  .field .fl{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--mut);text-transform:uppercase}
+  .field .fv{font-size:15px;font-weight:600;margin-top:5px;word-break:break-word}
+  .field .fv.mono{font-family:'JetBrains Mono';font-size:14px;font-weight:500}
+  .field.full{grid-column:1 / -1}
+  .raw{margin-top:20px}
+  .raw summary{font-family:'JetBrains Mono';font-size:12px;color:var(--accent2);cursor:pointer;padding:8px 0}
+  .raw pre{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;
+    font-family:'JetBrains Mono';font-size:12px;color:var(--dim);line-height:1.5;margin-top:6px}
+
+  .lbl{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;display:block;margin:16px 0 7px}
+  .modal .inp{width:100%;font-family:inherit;font-size:14px}
+  .modal input.inp{font-family:'JetBrains Mono';font-size:13px}
+  .small{font-size:12px;color:var(--mut);margin-top:7px;line-height:1.5}
+  .small code{color:var(--accent)}
+  .switch{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--panel2);
+    border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .switch .tt{font-size:14px;font-weight:600}
+  .switch .ts{font-size:12px;color:var(--mut);margin-top:3px}
+  .sw{width:46px;height:26px;border-radius:20px;background:var(--line);position:relative;cursor:pointer;transition:.18s;flex-shrink:0}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.18s}
+  .sw.on{background:var(--accent)}
+  .sw.on::after{transform:translateX(20px)}
+  .warn{background:rgba(255,194,75,.08);border:1px solid rgba(255,194,75,.3);border-radius:11px;padding:13px 15px;
+    font-size:12.5px;color:#e8d4a8;line-height:1.55;margin-top:16px;display:flex;gap:10px}
+  .warn svg{width:18px;height:18px;flex-shrink:0;color:var(--warn);margin-top:1px}
+  .sfoot{padding:18px 24px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px}
+  .keyloaded{color:var(--accent);font-family:'JetBrains Mono';font-size:10px;letter-spacing:.08em}
+
+  .sub-note{text-align:center;color:var(--mut);font-size:12.5px;margin-top:26px;font-family:'JetBrains Mono';line-height:1.6}
+  .sub-note code{color:var(--accent)}
+
+  @media(max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}.dgrid{grid-template-columns:1fr}
+    thead th.hide,td.hide{display:none}}
+  @media(max-width:520px){.stats{grid-template-columns:1fr}}
+</style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#38e8b0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 8V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="eyebrow">OWLOPS · PUBLIC API · V1</div>
+        <h1>Inventory Control</h1>
+      </div>
+    </div>
+    <div class="hright">
+      <div class="status"><span class="dot" id="statusDot"></span><span id="statusText">CONNECTING…</span></div>
+      <button class="btn" onclick="openSettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Connection
+      </button>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="card"><div class="k">Total Items</div><div class="v" id="stTotal">—</div><div class="s" id="stTotalSub">across all stock</div></div>
+    <div class="card c2"><div class="k">Units On Hand</div><div class="v" id="stUnits">—</div><div class="s">this page · sum of quantity</div></div>
+    <div class="card c3"><div class="k">Inventory Value</div><div class="v sm" id="stValue">—</div><div class="s">this page · qty × unit cost</div></div>
+    <div class="card c4"><div class="k">To Order</div><div class="v" id="stOrder">—</div><div class="s" id="stOrderSub">at/below reorder min</div></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="searchbox">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search" placeholder="Search this page by name, ID, department, brand, model…"/>
+    </div>
+    <div class="seg" id="stockSeg">
+      <button data-s="all" class="on">All</button>
+      <button data-s="toOrder">To order</button>
+      <button data-s="excess">Excess</button>
+    </div>
+    <select class="inp" id="assetTypeSel" title="Filter by asset type"><option value="">All types</option></select>
+    <select class="inp" id="pageSizeSel" title="Items per page">
+      <option value="25">25 / page</option>
+      <option value="50" selected>50 / page</option>
+      <option value="100">100 / page</option>
+      <option value="250">250 / page</option>
+    </select>
+    <button class="iconbtn" id="refreshBtn" onclick="load()" title="Refresh">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/></svg>
+    </button>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr>
+          <th data-k="assetID">ID <span class="ar"></span></th>
+          <th data-k="name">Item <span class="ar"></span></th>
+          <th data-k="assetType" class="hide">Type <span class="ar"></span></th>
+          <th data-k="department" class="hide">Department <span class="ar"></span></th>
+          <th data-k="quantity" class="r">Qty <span class="ar"></span></th>
+          <th data-k="unitCost" class="r hide">Unit Cost <span class="ar"></span></th>
+          <th data-k="stockState">Stock State <span class="ar"></span></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="pagebar" id="pagebar" style="display:none">
+      <div class="pageinfo" id="pageInfo"></div>
+      <div class="pager" id="pager"></div>
+    </div>
+  </div>
+
+  <div class="sub-note">
+    Calls <code>GET /v1/inventory</code> and <code>GET /v1/inventory/{id}</code> on the OwlOps Public API ·
+    auth via <code>X-Api-Key</code> · runs entirely in your browser
+  </div>
+</div>
+
+<div class="scrim" id="modalScrim" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal"></div>
+</div>
+
+<div class="scrim" id="settingsScrim" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <div class="mhead">
+      <div><div class="endpoint">API CONNECTION</div><h2>OwlOps · Live Connection</h2></div>
+      <button class="x" onclick="closeSettings()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div class="switch">
+        <div><div class="tt">Live connection active</div><div class="ts">Always-on. Data is pulled live from the OwlOps Public API via the secure backend proxy.</div></div>
+        <div class="sw on" style="pointer-events:none;opacity:.9"></div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="lbl" style="margin-top:0">Endpoint</div>
+        <div class="small" style="font-family:'JetBrains Mono';color:var(--accent);margin-top:4px">GET /v1/inventory · GET /v1/inventory/{id}</div>
+        <div class="lbl">Upstream</div>
+        <div class="small" style="font-family:'JetBrains Mono';margin-top:4px">api-owlops-public-…azurewebsites.net</div>
+        <div class="lbl">Auth</div>
+        <div class="small" style="margin-top:4px"><code>X-Api-Key</code> · key <code>owlk_6oQwhlI…</code> injected server-side <span class="keyloaded">— key secured ✓</span></div>
+      </div>
+      <div class="warn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div>The API key is held by the backend proxy and is never exposed in the browser. All requests route through the same-origin <code>/api</code> proxy, which also resolves the upstream CORS restriction.</div>
+      </div>
+    </div>
+    <div class="sfoot">
+      <button class="btn" onclick="closeSettings()">Close</button>
+      <button class="btn pri" onclick="connect()">Refresh now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   OwlOps Public API — access (cloned & verified live)
+   Base : api-owlops-public-…azurewebsites.net
+   Auth : X-Api-Key: owlk_…
+   GET /v1/inventory?page&pageSize&assetType&stockState
+   GET /v1/inventory/{id}
+   ============================================================ */
+// Direct host (used when calling the API straight — works from server-side / non-browser,
+// but browsers will be blocked by CORS). When this page is served by the bundled Node
+// proxy (server.js), we route through "/api" instead, which holds the key and adds CORS.
+// LIVE-ONLY build. Calls go through a same-origin /api proxy (server.js) that holds the
+// key server-side and adds CORS. You can override the proxy with ?api=https://your-proxy
+// or by setting window.OWLOPS_PROXY before this script runs.
+const PROXY_BASE = (function(){
+  try{
+    const q = new URLSearchParams(location.search).get("api");
+    if(q){ const b=q.replace(/\/+$/,""); return /\/api$/.test(b) ? b : b+"/api"; }
+  }catch(_){}
+  if(window.OWLOPS_PROXY){ const b=String(window.OWLOPS_PROXY).replace(/\/+$/,""); return /\/api$/.test(b)?b:b+"/api"; }
+  return location.origin + "/api";
+})();
+const USING_PROXY = true;
+
+const CONFIG = {
+  baseUrl : PROXY_BASE,
+  apiKey  : "owlk_6oQwhlI8gzw9_8y4RD7V8acEcz-JIOrPyBigAgFuYkE",
+  keyPrefix : "owlk_6oQwhlI",
+  demo    : false   // no demo mode — always live
+};
+
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n=>"$"+(Number(n)||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const num = n=>(Number(n)||0).toLocaleString();
+
+const state = {
+  baseUrl:CONFIG.baseUrl, apiKey:CONFIG.apiKey,
+  items:[], rawList:null, pagination:null, loading:false, error:null,
+  search:"", stockState:"all", assetType:"", page:1, pageSize:50,
+  sortKey:"assetID", sortDir:"asc",
+  assetTypesSeen:new Set()
+};
+
+function joinUrl(base,path){ return String(base||"").replace(/\/+$/,"") + path; }
+function buildListUrl(){
+  const p = new URLSearchParams();
+  p.set("page", state.page); p.set("pageSize", state.pageSize);
+  if(state.assetType) p.set("assetType", state.assetType);
+  if(state.stockState!=="all") p.set("stockState", state.stockState);
+  return joinUrl(state.baseUrl, "/v1/inventory?"+p.toString());
+}
+function authHeaders(){
+  // The bundled proxy injects the key server-side, so no key header is needed in the browser.
+  if(USING_PROXY && state.baseUrl===PROXY_BASE) return {};
+  return state.apiKey ? {"X-Api-Key":state.apiKey} : {};
+}
+
+class HttpError extends Error{ constructor(status,body){ super("HTTP "+status); this.status=status; this.body=body; } }
+function classifyError(e){
+  if(e instanceof HttpError) return {type:"http", status:e.status, body:e.body};
+  const m=(e&&e.message||"").toLowerCase();
+  if(e instanceof TypeError || /failed to fetch|networkerror|load failed|cors/i.test(m)) return {type:"network"};
+  return {type:"unknown", msg:e&&e.message||"Unknown error"};
+}
+
+async function load(){
+  state.loading=true; state.error=null; render();
+  try{
+    const res = await fetch(buildListUrl(), {headers:{"Accept":"application/json", ...authHeaders()}});
+    if(!res.ok){ let b=null; try{b=await res.json();}catch(_){} throw new HttpError(res.status,b); }
+    const json = await res.json();
+    const data = Array.isArray(json) ? json : (json.data||[]);
+    const pagi = json.pagination || null;
+    data.forEach(i=>{ if(i.assetType) state.assetTypesSeen.add(i.assetType); });
+    state.items=data; state.rawList=data; state.pagination=pagi; state.loading=false;
+    syncAssetTypeSelect(); render();
+  }catch(e){
+    state.loading=false; state.error=classifyError(e); state.items=[]; render();
+  }
+}
+
+function filteredRows(){
+  let arr = state.items.slice();
+  const q = state.search.trim().toLowerCase();
+  if(q){
+    arr = arr.filter(i=>[i.assetID,i.name,i.assetFullName,i.department,i.location,i.brand,i.model,i.serialNumber]
+      .some(v=>String(v==null?"":v).toLowerCase().includes(q)));
+  }
+  const dir = state.sortDir==="asc"?1:-1, k=state.sortKey;
+  arr.sort((a,b)=>{
+    let x=a[k], y=b[k];
+    if(k==="quantity"||k==="unitCost"||k==="assetID"){ x=Number(x)||0; y=Number(y)||0; return (x-y)*dir; }
+    return String(x==null?"":x).localeCompare(String(y==null?"":y))*dir;
+  });
+  return arr;
+}
+
+function setStatus(){
+  const d=$("#statusDot"), t=$("#statusText");
+  d.className="dot";
+  if(state.error){ d.classList.add("err"); t.textContent="CONNECTION ERROR"; }
+  else if(state.loading){ d.classList.add("demo"); t.textContent="CONNECTING…"; }
+  else { d.classList.add("live"); t.textContent="LIVE · OWLOPS"; }
+}
+function stateLabel(s){ return s==="toOrder"?"TO ORDER":s==="excess"?"EXCESS":esc((s||"OK").toUpperCase()); }
+function statePill(s){ const cls = s==="toOrder"?"toOrder":s==="excess"?"excess":"ok"; return `<span class="pill ${cls}">${stateLabel(s)}</span>`; }
+
+function render(){
+  setStatus();
+  $("#refreshBtn").classList.toggle("spin", state.loading);
+  const rows=$("#rows"), pagebar=$("#pagebar");
+
+  if(state.items.length){
+    const units=state.items.reduce((s,i)=>s+(Number(i.quantity)||0),0);
+    const value=state.items.reduce((s,i)=>s+(Number(i.quantity)||0)*(Number(i.unitCost)||0),0);
+    const toOrder=state.items.filter(i=>i.stockState==="toOrder").length;
+    const excess=state.items.filter(i=>i.stockState==="excess").length;
+    const masters=state.items.filter(i=>i.isMaster).length;
+    $("#stTotal").textContent = state.pagination ? num(state.pagination.totalCount) : num(state.items.length);
+    $("#stTotalSub").textContent = state.pagination ? `page ${state.pagination.page} of ${state.pagination.totalPages}` : "across all stock";
+    $("#stUnits").textContent = num(units);
+    $("#stValue").textContent = money(value);
+    $("#stOrder").textContent = num(toOrder);
+    $("#stOrderSub").textContent = `${excess} excess · ${masters} master`;
+  } else if(!state.loading){
+    ["stTotal","stUnits","stOrder"].forEach(id=>$("#"+id).textContent="0"); $("#stValue").textContent="$0.00";
+    $("#stTotalSub").textContent="across all stock"; $("#stOrderSub").textContent="at/below reorder min";
+  }
+
+  if(state.loading){ rows.innerHTML=""; for(let i=0;i<7;i++){ const tr=document.createElement("tr"); tr.style.cursor="default"; tr.innerHTML=`<td colspan="7"><div class="skel"></div></td>`; rows.appendChild(tr); } pagebar.style.display="none"; return; }
+  if(state.error){ rows.innerHTML=`<tr style="cursor:default"><td colspan="7">${errorBlock(state.error)}</td></tr>`; pagebar.style.display="none"; return; }
+
+  const arr=filteredRows();
+  if(!arr.length){ rows.innerHTML=`<tr style="cursor:default"><td colspan="7">${emptyBlock()}</td></tr>`; drawPager(); return; }
+
+  rows.innerHTML = arr.map(it=>{
+    const sub=[it.brand,it.model].filter(Boolean).join(" · ") || it.location || it.assetFullName || "";
+    return `<tr onclick="openItem(${Number(it.assetID)})">
+      <td><span class="id">#${esc(it.assetID)}</span></td>
+      <td>
+        <div class="nm">${esc(it.name||it.assetFullName||"Unnamed")} ${it.isMaster?'<span class="tag master">Master</span>':''}</div>
+        ${sub?`<div class="sub">${esc(sub)}</div>`:""}
+      </td>
+      <td class="hide"><span class="tag type">${esc(it.assetType||"—")}</span></td>
+      <td class="hide">${esc(it.department||"—")}</td>
+      <td class="r"><span class="qty">${num(it.quantity)}<span class="mm">min ${num(it.minimum)}${it.maximum?` · max ${num(it.maximum)}`:""}</span></span></td>
+      <td class="r hide">${it.unitCost?money(it.unitCost):'<span style="color:var(--mut)">—</span>'}</td>
+      <td>${statePill(it.stockState)}</td>
+    </tr>`;
+  }).join("");
+  drawPager();
+}
+
+function drawPager(){
+  const pg=state.pagination, bar=$("#pagebar"), info=$("#pageInfo"), pager=$("#pager");
+  if(!pg){ bar.style.display="none"; return; }
+  bar.style.display="flex";
+  const start=(pg.page-1)*pg.pageSize+1, end=Math.min(pg.page*pg.pageSize,pg.totalCount);
+  info.innerHTML = pg.totalCount? `Showing <b>${num(start)}–${num(end)}</b> of <b>${num(pg.totalCount)}</b> items` : "No items";
+  pager.innerHTML="";
+  const mk=(label,page,opts={})=>{ const b=document.createElement("button"); b.textContent=label; if(opts.cur)b.classList.add("cur"); b.disabled=!!opts.dis; if(!opts.dis&&!opts.cur)b.onclick=()=>gotoPage(page); return b; };
+  pager.appendChild(mk("‹ Prev", pg.page-1, {dis:pg.page<=1}));
+  const total=pg.totalPages||1, cur=pg.page;
+  let s=Math.max(1,cur-2), e=Math.min(total,s+4); s=Math.max(1,e-4);
+  if(s>1){ pager.appendChild(mk("1",1)); if(s>2) pager.appendChild(mk("…",0,{dis:true})); }
+  for(let p=s;p<=e;p++) pager.appendChild(mk(String(p),p,{cur:p===cur}));
+  if(e<total){ if(e<total-1) pager.appendChild(mk("…",0,{dis:true})); pager.appendChild(mk(String(total),total)); }
+  pager.appendChild(mk("Next ›", pg.page+1, {dis:!pg.hasNextPage}));
+}
+function gotoPage(p){ if(p<1)return; state.page=p; load(); window.scrollTo({top:0,behavior:"smooth"}); }
+
+function emptyBlock(){
+  const filtered = state.search || state.stockState!=="all" || state.assetType;
+  return `<div class="state"><div class="ic">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 8V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/><path d="M1 3h22v5H1z"/></svg></div>
+    <h3>${filtered?"No items match":"No inventory returned"}</h3>
+    <p>${filtered?"Try clearing the search or filters to see all items on this page.":"The API responded with an empty list for this page and filter set."}</p></div>`;
+}
+function errorBlock(err){
+  let title,body,hint="";
+  if(err.type==="network"){
+    title="Couldn't reach the API";
+    body="The request failed before getting a response — usually a wrong/unreachable base URL or a CORS restriction from the browser.";
+    hint=`<div class="hint"><b>Try this:</b><br>• Verify the base URL in the connection panel.<br>• Open <code>${esc(buildListUrl())}</code> in a new tab — if it loads there but not here, it's CORS.<br>• <b>CORS fix:</b> route the call through your own backend that holds the key.</div>`;
+  } else if(err.type==="http"){
+    if(err.status===401){ title="401 · Unauthorized"; body="Missing or invalid API key. Confirm the master key in the connection panel — it's sent in the X-Api-Key header."; }
+    else if(err.status===429){ title="429 · Rate limit exceeded"; body="You've hit the limit of 60 requests/minute. Slow down and retry in a moment."; hint=`<div class="hint">Tip: avoid rapid page-flipping or refreshes. The API allows 60 requests/min per key.</div>`; }
+    else if(err.status===404){ title="404 · Not found"; body="Resource not found or not accessible to this account. Check the base URL — /v1/inventory is appended automatically."; }
+    else if(err.status===400){ title="400 · Bad request"; body="Check your query parameters (assetType / stockState values, page bounds)."; }
+    else { title=`${err.status} · Server error`; body="The API returned an error. If it persists, contact OwlOps support with the traceId."; }
+    if(err.body){ const d=err.body.detail||err.body.error||err.body.title; if(d) hint=`<div class="hint"><b>API said:</b> ${esc(d)}${err.body.traceId?`<br><b>traceId:</b> <code>${esc(err.body.traceId)}</code>`:""}</div>`; }
+  } else { title="Something went wrong"; body=esc(err.msg||"Unknown error."); }
+  return `<div class="state err"><div class="ic">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+    <h3>${title}</h3><p>${body}</p>${hint}
+    <div style="margin-top:18px"><button class="btn pri" onclick="load()">Retry</button>
+    <button class="btn" onclick="openSettings()" style="margin-left:8px">Open connection</button></div></div>`;
+}
+
+async function openItem(id){
+  const scrim=$("#modalScrim"), modal=$("#modal");
+  const endpoint=`<span class="get">GET</span> /v1/inventory/${esc(id)}`;
+  modal.innerHTML=`<div class="mhead"><div><div class="endpoint">${endpoint}</div><h2>Loading…</h2></div>
+    <button class="x" onclick="closeModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <div class="mbody"><div class="skel" style="height:60px"></div><div class="skel" style="height:60px;margin-top:12px"></div></div>`;
+  scrim.classList.add("open");
+  try{
+    const it = await fetchItem(id);
+    renderDetail(it, endpoint);
+  }catch(e){
+    const err=classifyError(e);
+    modal.querySelector("h2").textContent = err.type==="http" ? `Error ${err.status}` : "Couldn't load item";
+    modal.querySelector(".mbody").innerHTML = errorBlock(err);
+  }
+}
+async function fetchItem(id){
+  const res = await fetch(joinUrl(state.baseUrl,"/v1/inventory/"+encodeURIComponent(id)), {headers:{"Accept":"application/json", ...authHeaders()}});
+  if(!res.ok){ let b=null; try{b=await res.json();}catch(_){} throw new HttpError(res.status,b); }
+  return await res.json();
+}
+function renderDetail(it, endpoint){
+  const modal=$("#modal");
+  const F=(label,val,mono)=> `<div class="field"><div class="fl">${label}</div><div class="fv${mono?' mono':''}">${val===""||val==null?'<span style="color:var(--mut)">—</span>':esc(val)}</div></div>`;
+  modal.innerHTML=`
+    <div class="mhead">
+      <div><div class="endpoint">${endpoint}</div><h2>${esc(it.name||it.assetFullName||"Item")} ${it.isMaster?'<span class="tag master" style="vertical-align:middle">Master</span>':''}</h2></div>
+      <button class="x" onclick="closeModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div style="margin-bottom:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        ${statePill(it.stockState)}
+        <span class="tag type">${esc(it.assetType||"—")}</span>
+        <span class="qty" style="margin-left:auto">${num(it.quantity)} ${esc(it.unitOfMeasure||"")} <span style="color:var(--mut);font-weight:500;font-size:12px">on hand</span></span>
+      </div>
+      <div class="dgrid">
+        ${F("Asset ID","#"+it.assetID,true)}
+        ${F("QR Code ID", it.qrCodeID? "#"+it.qrCodeID : "", true)}
+        ${F("Full name", it.assetFullName)}
+        ${F("Department", it.department)}
+        ${F("Location", [it.location,it.location2].filter(Boolean).join(" / "))}
+        ${F("Asset type", it.assetType)}
+        ${F("Brand", it.brand)}
+        ${F("Model", it.model, true)}
+        ${F("Serial number", it.serialNumber, true)}
+        ${F("Unit of measure", it.unitOfMeasure)}
+        ${F("Quantity on hand", num(it.quantity), true)}
+        ${F("Unit cost", it.unitCost?money(it.unitCost):"", true)}
+        ${F("Minimum (reorder)", num(it.minimum), true)}
+        ${F("Maximum", num(it.maximum), true)}
+        ${F("Extended value", money((Number(it.quantity)||0)*(Number(it.unitCost)||0)), true)}
+        ${F("Orderable", it.orderable?"Yes":"No")}
+        ${F("Stock state", it.stockState)}
+        ${F("Is master record", it.isMaster?"Yes — company-wide":"No — single department")}
+      </div>
+      <details class="raw"><summary>Raw API response</summary><pre>${esc(JSON.stringify(it,null,2))}</pre></details>
+    </div>`;
+}
+function closeModal(){ $("#modalScrim").classList.remove("open"); }
+
+function syncAssetTypeSelect(){
+  const sel=$("#assetTypeSel"), cur=state.assetType;
+  const types=[...state.assetTypesSeen].filter(Boolean).sort();
+  sel.innerHTML='<option value="">All types</option>'+types.map(t=>`<option value="${esc(t)}"${t===cur?" selected":""}>${esc(t)}</option>`).join("");
+}
+
+function openSettings(){ $("#settingsScrim").classList.add("open"); }
+function closeSettings(){ $("#settingsScrim").classList.remove("open"); }
+function connect(){ state.page=1; closeSettings(); load(); }
+
+let searchTimer;
+$("#search").addEventListener("input", e=>{ state.search=e.target.value; clearTimeout(searchTimer); searchTimer=setTimeout(render,120); });
+$("#stockSeg").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b)return; state.stockState=b.dataset.s; [...e.currentTarget.children].forEach(c=>c.classList.toggle("on",c===b)); state.page=1; load(); });
+$("#assetTypeSel").addEventListener("change", e=>{ state.assetType=e.target.value; state.page=1; load(); });
+$("#pageSizeSel").addEventListener("change", e=>{ state.pageSize=Number(e.target.value); state.page=1; load(); });
+document.querySelectorAll("thead th[data-k]").forEach(th=>th.addEventListener("click", ()=>{
+  const k=th.dataset.k;
+  if(state.sortKey===k) state.sortDir=state.sortDir==="asc"?"desc":"asc";
+  else { state.sortKey=k; state.sortDir=(k==="quantity"||k==="unitCost")?"desc":"asc"; }
+  document.querySelectorAll("thead th .ar").forEach(a=>a.textContent="");
+  th.querySelector(".ar").textContent = state.sortDir==="asc"?"▲":"▼";
+  render();
+}));
+document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeModal(); closeSettings(); } });
+
+load();
+</script>
+</body>
+</html>

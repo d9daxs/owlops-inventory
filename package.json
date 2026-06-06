@@ -1,0 +1,13 @@
+{
+  "name": "owlops-inventory-control",
+  "version": "1.0.0",
+  "description": "Live OwlOps inventory control dashboard with a built-in API proxy (holds the API key, adds CORS).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

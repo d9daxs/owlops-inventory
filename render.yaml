@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: owlops-inventory-control
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: API_KEY
+        value: owlk_6oQwhlI8gzw9_8y4RD7V8acEcz-JIOrPyBigAgFuYkE
+      - key: UPSTREAM
+        value: https://api-owlops-public-bugrb4gxeqcghqh5.eastus2-01.azurewebsites.net
