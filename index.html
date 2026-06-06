@@ -96,6 +96,8 @@
   .pagetitle .desc{font-size:13px;color:var(--dim);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .chip{font-family:'JetBrains Mono';font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--dim)}
   .chip.ph{color:var(--accent2)} .chip.role{color:var(--accent)} .chip.mkt{color:var(--hub)}
+  .chip.em{color:var(--master);text-decoration:none} .chip.em:hover{border-color:rgba(179,136,255,.4)}
+  .chip.ad{color:var(--dim);font-family:'Bricolage Grotesque',sans-serif;font-size:11px;max-width:100%}
 
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
   .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
@@ -177,6 +179,8 @@
   .vancard .vstat .vl{font-family:'JetBrains Mono';font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
   .vancard .vphone{font-family:'JetBrains Mono';font-size:11px;color:var(--accent2);margin-top:10px;display:flex;align-items:center;gap:6px}
   .vancard .vphone svg{width:12px;height:12px}
+  .vancard .vmeta{font-size:11px;color:var(--dim);margin-top:6px;display:flex;align-items:flex-start;gap:6px;word-break:break-word}
+  .vancard .vmeta svg{width:12px;height:12px;flex-shrink:0;margin-top:2px;color:var(--mut)}
 
   .sectit{font-size:15px;font-weight:700;margin:6px 0 12px;display:flex;align-items:center;gap:9px}
   .sectit .ln{flex:1;height:1px;background:var(--line)}
@@ -416,7 +420,7 @@ const USING_PROXY = true;
 const CONFIG = { baseUrl:PROXY_BASE, apiKey:"owlk_6oQwhlI8gzw9_8y4RD7V8acEcz-JIOrPyBigAgFuYkE", keyPrefix:"owlk_6oQwhlI", demo:false };
 
 /* ---- People roster (each = a van). Same inventory assigned to all. ---- */
-const MARKET_ORDER = ["ATL","Corpus Christi","Houston","New Paso","RGV","San Antonio"];
+const MARKET_ORDER = ["ATL","Corpus Christi","Houston","Minnesota","New Paso","RGV","San Antonio"];
 const PEOPLE = [
   {name:"Alfred Rainey",     title:"Cold/Hot",            market:"ATL",          phone:"678-437-3114"},
   {name:"Jadan Wright",      title:"Cold/Hot",            market:"ATL",          phone:"470-715-2206"},
@@ -442,6 +446,8 @@ const PEOPLE = [
   {name:"Yancy Gonzales",    title:"Cold/Hot side FT II", market:"San Antonio",  phone:"210-849-0180"},
   {name:"Jose Eric Juarez",  title:"Cold Side/GM",        market:"San Antonio",  phone:"210-910-8251"},
   {name:"Jaime Neira",       title:"Lead Tech",           market:"San Antonio",  phone:"210-418-0624"},
+  {name:"Stephen Stansberry",title:"Tech II",             market:"Minnesota",    phone:"612-616-7747", email:"sstansberry@ayvazpizza.com", address:"422 Emerson Ave N, Montrose, MN 55363"},
+  {name:"Prince Gee",        title:"Tech II",             market:"Minnesota",    phone:"503-307-3475", email:"pgee@ayvazpizza.com",        address:"10991 University Ave. NE, Apt. D, Minneapolis, MN 55434"},
 ];
 function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
 function initials(name){ return name.split(/\s+/).map(w=>w[0]).filter(Boolean).slice(0,2).join("").toUpperCase(); }
@@ -642,6 +648,8 @@ function renderChrome(){
         <span class="chip role">${esc(p.title)}</span>
         <span class="chip mkt">${esc(p.market)}</span>
         <span class="chip ph">${esc(p.phone)}</span>
+        ${p.email?`<a class="chip em" href="mailto:${esc(p.email)}">${esc(p.email)}</a>`:""}
+        ${p.address?`<span class="chip ad">${esc(p.address)}</span>`:""}
       </div></div>`;
     $("#st1k").textContent="Total Items"; $("#stUnitsSub").textContent="on this van";
     qtyTh.firstChild.textContent="Qty ";
@@ -659,6 +667,8 @@ function vanCardHTML(p){
       <div class="vstat"><div class="vn">${num(units)}</div><div class="vl">Units</div></div>
     </div>
     <div class="vphone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/></svg>${esc(p.phone)}</div>
+    ${p.email?`<div class="vmeta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>${esc(p.email)}</div>`:""}
+    ${p.address?`<div class="vmeta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(p.address)}</div>`:""}
   </div>`;
 }
 
