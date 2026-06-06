@@ -12,7 +12,7 @@
     --bg:#0a1020; --bg2:#0e1628; --panel:#101a30; --panel2:#0d1526;
     --line:#1d2c47; --line2:#26354f;
     --txt:#e8eef9; --dim:#9fb0cc; --out:#ff6b6b; --mut:#6b7da0;
-    --accent:#38e8b0; --accent2:#3aa8ff; --warn:#ffc24b; --low:#ffc24b; --master:#b388ff;
+    --accent:#38e8b0; --accent2:#3aa8ff; --warn:#ffc24b; --low:#ffc24b; --master:#b388ff; --hub:#ffa94d;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Bricolage Grotesque',system-ui,sans-serif;background:
@@ -20,16 +20,57 @@
     radial-gradient(900px 500px at 0% 100%,rgba(56,232,176,.07),transparent),
     var(--bg);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased}
   code,.mono{font-family:'JetBrains Mono',monospace}
-  .wrap{max-width:1280px;margin:0 auto;padding:26px 24px 70px}
 
-  header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
-  .brand{display:flex;align-items:center;gap:14px}
-  .logo{width:46px;height:46px;border-radius:13px;background:#fff;overflow:hidden;
-    border:1px solid var(--line);display:grid;place-items:center}
-  .logo svg{width:24px;height:24px}
-  .logo img{width:100%;height:100%;object-fit:contain;padding:6px}
-  .brand .eyebrow{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:600}
-  .brand h1{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  /* Layout: sidebar + main */
+  .app{display:flex;min-height:100vh}
+  .side{width:286px;flex-shrink:0;background:linear-gradient(180deg,var(--panel),var(--panel2));
+    border-right:1px solid var(--line);padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .side .brand{display:flex;align-items:center;gap:12px;padding:0 6px 18px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+  .logo{width:42px;height:42px;border-radius:12px;background:#fff;overflow:hidden;border:1px solid var(--line);display:grid;place-items:center;flex-shrink:0}
+  .logo img{width:100%;height:100%;object-fit:contain;padding:5px}
+  .brand h1{font-size:18px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+  .brand .sub{font-family:'JetBrains Mono';font-size:9.5px;letter-spacing:.16em;color:var(--mut);margin-top:2px}
+
+  .navsec{margin-top:16px}
+  .navsec .h{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.16em;color:var(--mut);text-transform:uppercase;padding:0 8px 8px}
+  .navitem{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;color:var(--dim);
+    font-size:13.5px;font-weight:600;transition:.13s;border:1px solid transparent;margin-bottom:2px}
+  .navitem:hover{background:var(--panel);color:var(--txt)}
+  .navitem.on{background:rgba(56,232,176,.12);color:var(--accent);border-color:rgba(56,232,176,.25)}
+  .navitem .ico{width:18px;height:18px;flex-shrink:0;display:grid;place-items:center}
+  .navitem .ico svg{width:17px;height:17px}
+  .navitem .count{margin-left:auto;font-family:'JetBrains Mono';font-size:10px;color:var(--mut);background:var(--panel2);
+    border:1px solid var(--line);border-radius:20px;padding:1px 8px}
+  .navitem.master.on{background:rgba(179,136,255,.13);color:var(--master);border-color:rgba(179,136,255,.3)}
+  .navitem.master:hover{color:var(--master)}
+
+  .hub{margin-bottom:4px}
+  .hubhead{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;color:var(--txt);
+    font-size:13px;font-weight:700;transition:.13s}
+  .hubhead:hover{background:var(--panel)}
+  .hubhead .chev{margin-left:auto;transition:.18s;color:var(--mut)}
+  .hubhead.open .chev{transform:rotate(90deg)}
+  .hubhead .ico{width:16px;height:16px;color:var(--hub)}
+  .hubhead .ico svg{width:16px;height:16px}
+  .hubhead .mkt{display:flex;flex-direction:column;line-height:1.15}
+  .hubhead .mkt small{font-family:'JetBrains Mono';font-size:9px;color:var(--mut);font-weight:500;letter-spacing:.05em}
+  .vans{padding:2px 0 6px 14px;margin-left:8px;border-left:1px solid var(--line);display:none}
+  .vans.open{display:block}
+  .vanitem{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;cursor:pointer;color:var(--dim);
+    font-size:12.5px;transition:.12s;margin-bottom:1px}
+  .vanitem:hover{background:var(--panel);color:var(--txt)}
+  .vanitem.on{background:rgba(58,168,255,.12);color:var(--accent2)}
+  .vanitem .av{width:24px;height:24px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);
+    display:grid;place-items:center;font-family:'JetBrains Mono';font-size:10px;font-weight:700;color:var(--dim);flex-shrink:0}
+  .vanitem.on .av{color:var(--accent2);border-color:rgba(58,168,255,.3)}
+  .vanitem .vn{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vanitem .role{font-family:'JetBrains Mono';font-size:8.5px;color:var(--mut);background:var(--panel2);border-radius:5px;padding:1px 5px}
+
+  .main{flex:1;min-width:0;padding:26px 30px 70px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+  .crumb{font-family:'JetBrains Mono';font-size:11px;color:var(--mut);letter-spacing:.05em;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .crumb a{color:var(--accent2);cursor:pointer;text-decoration:none}
+  .crumb a:hover{text-decoration:underline}
   .hright{display:flex;align-items:center;gap:12px}
   .status{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono';font-size:11px;
     letter-spacing:.08em;color:var(--dim);padding:8px 13px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
@@ -44,6 +85,18 @@
   .btn svg{width:15px;height:15px}
   .btn.pri{background:linear-gradient(135deg,var(--accent),#23c79a);color:#05231a;border:none;font-weight:700}
   .btn.pri:hover{filter:brightness(1.07)}
+
+  .pagetitle{display:flex;align-items:center;gap:14px;margin:14px 0 18px}
+  .pagetitle .bgico{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;flex-shrink:0;
+    background:var(--panel);border:1px solid var(--line)}
+  .pagetitle .bgico svg{width:26px;height:26px;color:var(--accent)}
+  .pagetitle.master .bgico{border-color:rgba(179,136,255,.35);background:rgba(179,136,255,.08)} .pagetitle.master .bgico svg{color:var(--master)}
+  .pagetitle.hub .bgico{border-color:rgba(255,169,77,.35);background:rgba(255,169,77,.08)} .pagetitle.hub .bgico svg{color:var(--hub)}
+  .pagetitle.van .bgico{border-color:rgba(58,168,255,.35);background:rgba(58,168,255,.08)} .pagetitle.van .bgico svg{color:var(--accent2)}
+  .pagetitle h2{font-size:25px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+  .pagetitle .desc{font-size:13px;color:var(--dim);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .chip{font-family:'JetBrains Mono';font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--dim)}
+  .chip.ph{color:var(--accent2)} .chip.role{color:var(--accent)} .chip.mkt{color:var(--hub)}
 
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
   .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
@@ -109,6 +162,27 @@
   .pill.excess{color:var(--accent);border-color:rgba(56,232,176,.35);background:rgba(56,232,176,.08)}
   .pill.ok{color:var(--dim);border-color:var(--line);background:transparent}
 
+  /* Van grid (hub view) */
+  .vangrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:22px}
+  .vancard{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:14px;
+    padding:16px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}
+  .vancard::before{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,var(--accent2),transparent)}
+  .vancard:hover{border-color:#33476c;transform:translateY(-2px)}
+  .vancard .vh{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+  .vancard .av{width:38px;height:38px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);
+    display:grid;place-items:center;font-family:'JetBrains Mono';font-size:13px;font-weight:700;color:var(--accent2);flex-shrink:0}
+  .vancard .vname{font-weight:700;font-size:14.5px;line-height:1.15}
+  .vancard .vrole{font-family:'JetBrains Mono';font-size:10px;color:var(--mut);margin-top:2px}
+  .vancard .vstats{display:flex;gap:14px;margin-top:10px;padding-top:12px;border-top:1px solid var(--line)}
+  .vancard .vstat .vn{font-size:18px;font-weight:800;letter-spacing:-.02em}
+  .vancard .vstat .vl{font-family:'JetBrains Mono';font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+  .vancard .vphone{font-family:'JetBrains Mono';font-size:11px;color:var(--accent2);margin-top:10px;display:flex;align-items:center;gap:6px}
+  .vancard .vphone svg{width:12px;height:12px}
+
+  .sectit{font-size:15px;font-weight:700;margin:6px 0 12px;display:flex;align-items:center;gap:9px}
+  .sectit .ln{flex:1;height:1px;background:var(--line)}
+  .sectit .ico{width:18px;height:18px;color:var(--hub)} .sectit .ico svg{width:18px;height:18px}
+
   .pagebar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
     padding:14px 16px;border-top:1px solid var(--line);background:var(--panel)}
   .pageinfo{font-family:'JetBrains Mono';font-size:12px;color:var(--dim)}
@@ -133,6 +207,15 @@
   .skel{height:30px;border-radius:8px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);
     background-size:200% 100%;animation:sh 1.3s infinite}
   @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+  .linkcard{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid rgba(179,136,255,.25);
+    border-radius:14px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.15s}
+  .linkcard:hover{border-color:rgba(179,136,255,.5);transform:translateY(-1px)}
+  .linkcard .lic{width:42px;height:42px;border-radius:11px;background:rgba(179,136,255,.1);border:1px solid rgba(179,136,255,.3);
+    display:grid;place-items:center;color:var(--master);flex-shrink:0} .linkcard .lic svg{width:22px;height:22px}
+  .linkcard .lt{font-weight:700;font-size:14.5px}
+  .linkcard .ls{font-size:12px;color:var(--dim);margin-top:2px}
+  .linkcard .larr{margin-left:auto;color:var(--master)}
 
   .scrim{position:fixed;inset:0;background:rgba(5,9,18,.72);backdrop-filter:blur(5px);display:none;
     align-items:flex-start;justify-content:center;padding:50px 18px;z-index:50;overflow:auto}
@@ -162,7 +245,6 @@
 
   .lbl{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;display:block;margin:16px 0 7px}
   .modal .inp{width:100%;font-family:inherit;font-size:14px}
-  .modal input.inp{font-family:'JetBrains Mono';font-size:13px}
   .small{font-size:12px;color:var(--mut);margin-top:7px;line-height:1.5}
   .small code{color:var(--accent)}
   .switch{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--panel2);
@@ -179,9 +261,16 @@
   .sfoot{padding:18px 24px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px}
   .keyloaded{color:var(--accent);font-family:'JetBrains Mono';font-size:10px;letter-spacing:.08em}
 
-  .sub-note{text-align:center;color:var(--mut);font-size:12.5px;margin-top:26px;font-family:'JetBrains Mono';line-height:1.6}
-  .sub-note code{color:var(--accent)}
-
+  .mobtop{display:none}
+  @media(max-width:980px){
+    .app{flex-direction:column}
+    .side{position:fixed;left:0;top:0;z-index:60;height:100vh;transform:translateX(-100%);transition:.22s;width:280px}
+    .side.open{transform:none;box-shadow:0 0 40px rgba(0,0,0,.5)}
+    .main{padding:18px 18px 70px}
+    .mobtop{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+    .sideback{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:55;display:none}
+    .sideback.open{display:block}
+  }
   @media(max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}.dgrid{grid-template-columns:1fr}
     thead th.hide,td.hide{display:none}}
   @media(max-width:520px){.stats{grid-template-columns:1fr}}
@@ -189,76 +278,94 @@
 <script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
 </head>
 <body>
-<div class="wrap">
+<div class="app">
 
-  <header>
+  <div class="sideback" id="sideback" onclick="toggleSide(false)"></div>
+  <aside class="side" id="side">
     <div class="brand">
-      <div class="logo">
-        <img src="data:image/png;base64,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" alt="Logo"/>
+      <div class="logo"><img src="data:image/png;base64,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" alt="Logo"/></div>
+      <div><h1>Inventory Control</h1><div class="sub">FLEET · WAREHOUSE</div></div>
+    </div>
+
+    <div class="navsec">
+      <div class="h">Warehouse</div>
+      <div class="navitem master" id="nav-master" onclick="go('master')">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/><path d="M3 8h18"/></svg></span>
+        Master Warehouse
+        <span class="count" id="cnt-master"></span>
       </div>
-      <div>
-        <h1>Inventory Control</h1>
+    </div>
+
+    <div class="navsec">
+      <div class="h">Regional Hubs</div>
+      <div id="hubNav"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="mobtop">
+      <button class="iconbtn" onclick="toggleSide(true)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button>
+      <div class="brand" style="border:none;padding:0;margin:0"><div class="logo" style="width:34px;height:34px"><img src="data:image/png;base64,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" alt="Logo"/></div><h1 style="font-size:16px">Inventory Control</h1></div>
+    </div>
+
+    <div class="topbar">
+      <div class="crumb" id="crumb"></div>
+      <div class="hright">
+        <div class="status"><span class="dot" id="statusDot"></span><span id="statusText">CONNECTING…</span></div>
+        <button class="btn" onclick="openSettings()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Connection
+        </button>
       </div>
     </div>
-    <div class="hright">
-      <div class="status"><span class="dot" id="statusDot"></span><span id="statusText">CONNECTING…</span></div>
-      <button class="btn" onclick="openSettings()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        Connection
-      </button>
-    </div>
-  </header>
 
-  <div class="stats">
-    <div class="card"><div class="k">Total Items</div><div class="v" id="stTotal">—</div><div class="s" id="stTotalSub">across all stock</div></div>
-    <div class="card c2"><div class="k">Units On Hand</div><div class="v" id="stUnits">—</div><div class="s">this page · sum of quantity</div></div>
-    <div class="card c3"><div class="k">Inventory Value</div><div class="v sm" id="stValue">—</div><div class="s">this page · qty × unit cost</div></div>
-    <div class="card c4"><div class="k">To Order</div><div class="v" id="stOrder">—</div><div class="s" id="stOrderSub">at/below reorder min</div></div>
-  </div>
+    <div class="pagetitle" id="pageTitle"></div>
 
-  <div class="toolbar">
-    <div class="searchbox">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="search" placeholder="Search this page by name, ID, department, brand, model…"/>
-    </div>
-    <div class="seg" id="stockSeg">
-      <button data-s="all" class="on">All</button>
-      <button data-s="toOrder">To order</button>
-      <button data-s="excess">Excess</button>
-    </div>
-    <select class="inp" id="assetTypeSel" title="Filter by asset type"><option value="">All types</option></select>
-    <select class="inp" id="pageSizeSel" title="Items per page">
-      <option value="25">25 / page</option>
-      <option value="50" selected>50 / page</option>
-      <option value="100">100 / page</option>
-      <option value="250">250 / page</option>
-    </select>
-    <button class="iconbtn" id="refreshBtn" onclick="load()" title="Refresh">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/></svg>
-    </button>
-  </div>
+    <!-- Hub view: van cards + link to master -->
+    <div id="hubBlock" style="display:none"></div>
 
-  <div class="tablewrap">
-    <table>
-      <thead>
-        <tr>
-          <th data-k="assetID">ID <span class="ar"></span></th>
-          <th data-k="name">Item <span class="ar"></span></th>
-          <th data-k="assetType" class="hide">Type <span class="ar"></span></th>
-          <th data-k="department" class="hide">Department <span class="ar"></span></th>
-          <th data-k="quantity" class="r">Qty <span class="ar"></span></th>
-          <th data-k="unitCost" class="r hide">Unit Cost <span class="ar"></span></th>
-          <th data-k="stockState">Stock State <span class="ar"></span></th>
-        </tr>
-      </thead>
-      <tbody id="rows"></tbody>
-    </table>
-    <div class="pagebar" id="pagebar" style="display:none">
-      <div class="pageinfo" id="pageInfo"></div>
-      <div class="pager" id="pager"></div>
+    <div class="stats">
+      <div class="card"><div class="k" id="st1k">Total Items</div><div class="v" id="stTotal">—</div><div class="s" id="stTotalSub">across all stock</div></div>
+      <div class="card c2"><div class="k">Units On Hand</div><div class="v" id="stUnits">—</div><div class="s" id="stUnitsSub">sum of quantity</div></div>
+      <div class="card c3"><div class="k">Inventory Value</div><div class="v sm" id="stValue">—</div><div class="s">qty × unit cost</div></div>
+      <div class="card c4"><div class="k">To Order</div><div class="v" id="stOrder">—</div><div class="s" id="stOrderSub">at/below reorder min</div></div>
     </div>
-  </div>
 
+    <div class="toolbar">
+      <div class="searchbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="search" placeholder="Search by name, ID, department, brand, model…"/>
+      </div>
+      <div class="seg" id="stockSeg">
+        <button data-s="all" class="on">All</button>
+        <button data-s="toOrder">To order</button>
+        <button data-s="excess">Excess</button>
+      </div>
+      <select class="inp" id="assetTypeSel" title="Filter by asset type"><option value="">All types</option></select>
+      <button class="iconbtn" id="refreshBtn" onclick="load()" title="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/></svg></button>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-k="assetID">ID <span class="ar"></span></th>
+            <th data-k="name">Item <span class="ar"></span></th>
+            <th data-k="assetType" class="hide">Type <span class="ar"></span></th>
+            <th data-k="department" class="hide">Department <span class="ar"></span></th>
+            <th data-k="quantity" class="r" id="qtyTh">Qty <span class="ar"></span></th>
+            <th data-k="unitCost" class="r hide">Unit Cost <span class="ar"></span></th>
+            <th data-k="stockState">Stock State <span class="ar"></span></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="pagebar" id="pagebar" style="display:none">
+        <div class="pageinfo" id="pageInfo"></div>
+        <div class="pager" id="pager"></div>
+      </div>
+    </div>
+  </main>
 </div>
 
 <div class="scrim" id="modalScrim" onclick="if(event.target===this)closeModal()">
@@ -279,14 +386,12 @@
       <div style="margin-top:16px">
         <div class="lbl" style="margin-top:0">Endpoint</div>
         <div class="small" style="font-family:'JetBrains Mono';color:var(--accent);margin-top:4px">GET /v1/inventory · GET /v1/inventory/{id}</div>
-        <div class="lbl">Upstream</div>
-        <div class="small" style="font-family:'JetBrains Mono';margin-top:4px">api-owlops-public-…azurewebsites.net</div>
         <div class="lbl">Auth</div>
-        <div class="small" style="margin-top:4px"><code>X-Api-Key</code> · key <code>owlk_6oQwhlI…</code> injected server-side <span class="keyloaded">— key secured ✓</span></div>
+        <div class="small" style="margin-top:4px"><code>X-Api-Key</code> · key injected server-side <span class="keyloaded">— key secured ✓</span></div>
       </div>
       <div class="warn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <div>The API key is held by the backend proxy and is never exposed in the browser. All requests route through the same-origin <code>/api</code> proxy, which also resolves the upstream CORS restriction.</div>
+        <div>The API key is held by the backend proxy and never exposed in the browser. Requests route through the same-origin <code>/api</code> proxy, which also resolves the upstream CORS restriction.</div>
       </div>
     </div>
     <div class="sfoot">
@@ -298,61 +403,72 @@
 
 <script>
 /* ============================================================
-   OwlOps Public API — access (cloned & verified live)
-   Base : api-owlops-public-…azurewebsites.net
-   Auth : X-Api-Key: owlk_…
+   OwlOps Public API — live inventory, multi-tech fleet model
    GET /v1/inventory?page&pageSize&assetType&stockState
    GET /v1/inventory/{id}
    ============================================================ */
-// Direct host (used when calling the API straight — works from server-side / non-browser,
-// but browsers will be blocked by CORS). When this page is served by the bundled Node
-// proxy (server.js), we route through "/api" instead, which holds the key and adds CORS.
-// LIVE-ONLY build. Calls go through a same-origin /api proxy (server.js) that holds the
-// key server-side and adds CORS. You can override the proxy with ?api=https://your-proxy
-// or by setting window.OWLOPS_PROXY before this script runs.
 const PROXY_BASE = (function(){
-  try{
-    const q = new URLSearchParams(location.search).get("api");
-    if(q){ const b=q.replace(/\/+$/,""); return /\/api$/.test(b) ? b : b+"/api"; }
-  }catch(_){}
+  try{ const q=new URLSearchParams(location.search).get("api");
+    if(q){ const b=q.replace(/\/+$/,""); return /\/api$/.test(b)?b:b+"/api"; } }catch(_){}
   if(window.OWLOPS_PROXY){ const b=String(window.OWLOPS_PROXY).replace(/\/+$/,""); return /\/api$/.test(b)?b:b+"/api"; }
   return location.origin + "/api";
 })();
 const USING_PROXY = true;
+const CONFIG = { baseUrl:PROXY_BASE, apiKey:"owlk_6oQwhlI8gzw9_8y4RD7V8acEcz-JIOrPyBigAgFuYkE", keyPrefix:"owlk_6oQwhlI", demo:false };
 
-const CONFIG = {
-  baseUrl : PROXY_BASE,
-  apiKey  : "owlk_6oQwhlI8gzw9_8y4RD7V8acEcz-JIOrPyBigAgFuYkE",
-  keyPrefix : "owlk_6oQwhlI",
-  demo    : false   // no demo mode — always live
-};
+/* ---- People roster (each = a van). Same inventory assigned to all. ---- */
+const MARKET_ORDER = ["ATL","Corpus Christi","Houston","New Paso","RGV","San Antonio"];
+const PEOPLE = [
+  {name:"Alfred Rainey",     title:"Cold/Hot",            market:"ATL",          phone:"678-437-3114"},
+  {name:"Jadan Wright",      title:"Cold/Hot",            market:"ATL",          phone:"470-715-2206"},
+  {name:"Russell Jennings",  title:"GM",                  market:"ATL",          phone:"678-457-9944"},
+  {name:"Quentin Trent",     title:"Cold/Hot side FT II", market:"Corpus Christi",phone:"361-463-7540"},
+  {name:"Mark Barron",       title:"Cold/Hot side FT II", market:"Corpus Christi",phone:"361-696-1603"},
+  {name:"Larry Marshall",    title:"Cold/Hot side FT II", market:"Corpus Christi",phone:"361-775-8622"},
+  {name:"Luis Hernandez",    title:"GM",                  market:"Corpus Christi",phone:"361-701-1022"},
+  {name:"Ricky Alaro",       title:"Cold Side FT II",     market:"Houston",      phone:"713-931-5557"},
+  {name:"Edgar Santana",     title:"Cold/Hot Side FT II", market:"Houston",      phone:"832-445-5755"},
+  {name:"David Brown",       title:"GM",                  market:"Houston",      phone:"409-225-2904"},
+  {name:"Edwuije Saintilien",title:"Cold/Hot Side FT II", market:"Houston",      phone:"407-799-8324"},
+  {name:"Johnny Cuevas",     title:"GM",                  market:"Houston",      phone:"832-886-7761"},
+  {name:"Ruben Alarcon",     title:"Cold/Hot Side FT II", market:"New Paso",     phone:"915-630-6707"},
+  {name:"Jesus Reyes",       title:"Cold/Hot Side FT II", market:"New Paso",     phone:"915-247-1694"},
+  {name:"Oscar Gomez",       title:"GM",                  market:"New Paso",     phone:"915-303-1415"},
+  {name:"Jorge Lopez",       title:"Cold/Hot Side FT II", market:"RGV",          phone:"956-825-8121"},
+  {name:"Angel Torres",      title:"Cold side FT I",      market:"RGV",          phone:"956-776-5312"},
+  {name:"Osvaldo Gutierrez", title:"Cold side FT I",      market:"RGV",          phone:"956-744-7743"},
+  {name:"Ricardo Ortega",    title:"Cold side FT I",      market:"RGV",          phone:"956-358-7096"},
+  {name:"Dagoberto Zayas",   title:"GM",                  market:"RGV",          phone:"956-821-2597"},
+  {name:"Jose A. Maysonet",  title:"Cold/Hot side FT II", market:"San Antonio",  phone:"210-777-6331"},
+  {name:"Yancy Gonzales",    title:"Cold/Hot side FT II", market:"San Antonio",  phone:"210-849-0180"},
+  {name:"Jose Eric Juarez",  title:"Cold Side/GM",        market:"San Antonio",  phone:"210-910-8251"},
+  {name:"Jaime Neira",       title:"Lead Tech",           market:"San Antonio",  phone:"210-418-0624"},
+];
+function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
+function initials(name){ return name.split(/\s+/).map(w=>w[0]).filter(Boolean).slice(0,2).join("").toUpperCase(); }
+PEOPLE.forEach(p=>{ p.id=slug(p.name); });
+function peopleInMarket(m){ return PEOPLE.filter(p=>p.market===m); }
+function findPerson(id){ return PEOPLE.find(p=>p.id===id); }
 
 const $ = s=>document.querySelector(s);
 const esc = s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const money = n=>"$"+(Number(n)||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 const num = n=>(Number(n)||0).toLocaleString();
 
+/* ---- App state ---- */
 const state = {
   baseUrl:CONFIG.baseUrl, apiKey:CONFIG.apiKey,
-  items:[], rawList:null, pagination:null, loading:false, error:null,
-  search:"", stockState:"all", assetType:"", page:1, pageSize:50,
+  view:{type:"master"},           // {type:'master'} | {type:'hub',market} | {type:'van',id}
+  baseItems:[],                   // raw catalog from API (one van's worth)
+  items:[],                       // items shown in current view (scaled/aggregated)
+  pagination:null, loading:false, error:null,
+  search:"", stockState:"all", assetType:"",
   sortKey:"assetID", sortDir:"asc",
   assetTypesSeen:new Set()
 };
 
 function joinUrl(base,path){ return String(base||"").replace(/\/+$/,"") + path; }
-function buildListUrl(){
-  const p = new URLSearchParams();
-  p.set("page", state.page); p.set("pageSize", state.pageSize);
-  if(state.assetType) p.set("assetType", state.assetType);
-  if(state.stockState!=="all") p.set("stockState", state.stockState);
-  return joinUrl(state.baseUrl, "/v1/inventory?"+p.toString());
-}
-function authHeaders(){
-  // The bundled proxy injects the key server-side, so no key header is needed in the browser.
-  if(USING_PROXY && state.baseUrl===PROXY_BASE) return {};
-  return state.apiKey ? {"X-Api-Key":state.apiKey} : {};
-}
+function authHeaders(){ if(USING_PROXY && state.baseUrl===PROXY_BASE) return {}; return state.apiKey?{"X-Api-Key":state.apiKey}:{}; }
 
 class HttpError extends Error{ constructor(status,body){ super("HTTP "+status); this.status=status; this.body=body; } }
 function classifyError(e){
@@ -362,51 +478,195 @@ function classifyError(e){
   return {type:"unknown", msg:e&&e.message||"Unknown error"};
 }
 
+/* ---- Fetch entire catalog (all pages) so we can aggregate across vans ---- */
+async function fetchAllInventory(){
+  let page=1, pageSize=250, out=[], guard=0;
+  while(guard++<50){
+    const p=new URLSearchParams(); p.set("page",page); p.set("pageSize",pageSize);
+    const res=await fetch(joinUrl(state.baseUrl,"/v1/inventory?"+p.toString()), {headers:{"Accept":"application/json",...authHeaders()}});
+    if(!res.ok){ let b=null; try{b=await res.json();}catch(_){} throw new HttpError(res.status,b); }
+    const json=await res.json();
+    const data=Array.isArray(json)?json:(json.data||[]);
+    out=out.concat(data);
+    const pg=json.pagination;
+    if(!pg || !pg.hasNextPage || data.length===0) break;
+    page++;
+  }
+  return out;
+}
+
 async function load(){
   state.loading=true; state.error=null; render();
   try{
-    const res = await fetch(buildListUrl(), {headers:{"Accept":"application/json", ...authHeaders()}});
-    if(!res.ok){ let b=null; try{b=await res.json();}catch(_){} throw new HttpError(res.status,b); }
-    const json = await res.json();
-    const data = Array.isArray(json) ? json : (json.data||[]);
-    const pagi = json.pagination || null;
+    const data = await fetchAllInventory();
     data.forEach(i=>{ if(i.assetType) state.assetTypesSeen.add(i.assetType); });
-    state.items=data; state.rawList=data; state.pagination=pagi; state.loading=false;
-    syncAssetTypeSelect(); render();
+    state.baseItems = data;
+    state.loading=false;
+    syncAssetTypeSelect();
+    rebuildView();
   }catch(e){
-    state.loading=false; state.error=classifyError(e); state.items=[]; render();
+    state.loading=false; state.error=classifyError(e); state.baseItems=[]; state.items=[]; render();
   }
 }
 
+/* ---- Build the items for the current view by scaling the base catalog ---- */
+function vansForView(){
+  if(state.view.type==="master") return PEOPLE.length;
+  if(state.view.type==="hub")    return peopleInMarket(state.view.market).length;
+  return 1; // van
+}
+function scaleItem(it, vans){
+  if(vans<=1) return {...it};
+  const c={...it};
+  c.quantity = (Number(it.quantity)||0) * vans;
+  c.minimum  = (Number(it.minimum)||0)  * vans;
+  c.maximum  = (Number(it.maximum)||0)  * vans;
+  c._vans = vans;
+  return c;
+}
+function rebuildView(){
+  const vans = vansForView();
+  state.items = state.baseItems.map(it=>scaleItem(it, vans));
+  state.pagination=null;
+  render();
+}
+
 function filteredRows(){
-  let arr = state.items.slice();
-  const q = state.search.trim().toLowerCase();
-  if(q){
-    arr = arr.filter(i=>[i.assetID,i.name,i.assetFullName,i.department,i.location,i.brand,i.model,i.serialNumber]
-      .some(v=>String(v==null?"":v).toLowerCase().includes(q)));
-  }
-  const dir = state.sortDir==="asc"?1:-1, k=state.sortKey;
-  arr.sort((a,b)=>{
-    let x=a[k], y=b[k];
+  let arr=state.items.slice();
+  const q=state.search.trim().toLowerCase();
+  if(q){ arr=arr.filter(i=>[i.assetID,i.name,i.assetFullName,i.department,i.location,i.brand,i.model,i.serialNumber]
+    .some(v=>String(v==null?"":v).toLowerCase().includes(q))); }
+  if(state.stockState!=="all") arr=arr.filter(i=>i.stockState===state.stockState);
+  if(state.assetType) arr=arr.filter(i=>i.assetType===state.assetType);
+  const dir=state.sortDir==="asc"?1:-1, k=state.sortKey;
+  arr.sort((a,b)=>{ let x=a[k],y=b[k];
     if(k==="quantity"||k==="unitCost"||k==="assetID"){ x=Number(x)||0; y=Number(y)||0; return (x-y)*dir; }
-    return String(x==null?"":x).localeCompare(String(y==null?"":y))*dir;
-  });
+    return String(x==null?"":x).localeCompare(String(y==null?"":y))*dir; });
   return arr;
 }
 
 function setStatus(){
-  const d=$("#statusDot"), t=$("#statusText");
-  d.className="dot";
+  const d=$("#statusDot"), t=$("#statusText"); d.className="dot";
   if(state.error){ d.classList.add("err"); t.textContent="CONNECTION ERROR"; }
   else if(state.loading){ d.classList.add("demo"); t.textContent="CONNECTING…"; }
   else { d.classList.add("live"); t.textContent="LIVE · OWLOPS"; }
 }
 function stateLabel(s){ return s==="toOrder"?"TO ORDER":s==="excess"?"EXCESS":esc((s||"OK").toUpperCase()); }
-function statePill(s){ const cls = s==="toOrder"?"toOrder":s==="excess"?"excess":"ok"; return `<span class="pill ${cls}">${stateLabel(s)}</span>`; }
+function statePill(s){ const cls=s==="toOrder"?"toOrder":s==="excess"?"excess":"ok"; return `<span class="pill ${cls}">${stateLabel(s)}</span>`; }
+
+/* ---- Sidebar nav ---- */
+function buildNav(){
+  const wrap=$("#hubNav"); wrap.innerHTML="";
+  MARKET_ORDER.forEach(m=>{
+    const ppl=peopleInMarket(m); if(!ppl.length) return;
+    const hub=document.createElement("div"); hub.className="hub";
+    const open = (state.view.type==="hub"&&state.view.market===m) || (state.view.type==="van"&&findPerson(state.view.id)?.market===m);
+    hub.innerHTML=`
+      <div class="hubhead ${open?'open':''}" data-m="${esc(m)}">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="1" y="6" width="14" height="12" rx="1.5"/><path d="M15 9h3.5L23 13v4h-8"/><circle cx="6" cy="18.5" r="2"/><circle cx="18" cy="18.5" r="2"/></svg></span>
+        <span class="mkt">${esc(m)}<small>${ppl.length} vans</small></span>
+        <span class="chev"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></span>
+      </div>
+      <div class="vans ${open?'open':''}" data-vans="${esc(m)}"></div>`;
+    wrap.appendChild(hub);
+    const vansBox=hub.querySelector(".vans");
+    // hub overview entry
+    const ov=document.createElement("div"); ov.className="vanitem"+(state.view.type==="hub"&&state.view.market===m?" on":"");
+    ov.innerHTML=`<span class="av" style="color:var(--hub);border-color:rgba(255,169,77,.3)">◎</span><span class="vn">Hub overview</span>`;
+    ov.onclick=(e)=>{ e.stopPropagation(); go("hub",{market:m}); };
+    vansBox.appendChild(ov);
+    ppl.forEach(p=>{
+      const v=document.createElement("div"); v.className="vanitem"+(state.view.type==="van"&&state.view.id===p.id?" on":"");
+      v.innerHTML=`<span class="av">${initials(p.name)}</span><span class="vn">${esc(p.name)}</span><span class="role">${esc(roleShort(p.title))}</span>`;
+      v.onclick=(e)=>{ e.stopPropagation(); go("van",{id:p.id}); };
+      vansBox.appendChild(v);
+    });
+    hub.querySelector(".hubhead").onclick=()=>{
+      hub.querySelector(".hubhead").classList.toggle("open");
+      vansBox.classList.toggle("open");
+    };
+  });
+}
+function roleShort(t){ if(/gm/i.test(t)&&!/cold/i.test(t))return "GM"; if(/lead/i.test(t))return "LEAD"; if(/gm/i.test(t))return "GM"; return "TECH"; }
+function markNav(){
+  document.querySelectorAll(".navitem").forEach(n=>n.classList.toggle("on", n.id==="nav-master" && state.view.type==="master"));
+  buildNav();
+}
+
+/* ---- Navigation ---- */
+function go(type, opts={}){
+  if(type==="master") state.view={type:"master"};
+  else if(type==="hub") state.view={type:"hub", market:opts.market};
+  else if(type==="van") state.view={type:"van", id:opts.id};
+  state.search=""; $("#search").value=""; state.stockState="all";
+  document.querySelectorAll("#stockSeg button").forEach(b=>b.classList.toggle("on",b.dataset.s==="all"));
+  state.assetType=""; const sel=$("#assetTypeSel"); if(sel) sel.value="";
+  markNav(); rebuildView(); toggleSide(false); window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ---- Render header / crumb / hub block per view ---- */
+function renderChrome(){
+  const crumb=$("#crumb"), title=$("#pageTitle"), hubBlock=$("#hubBlock"), qtyTh=$("#qtyTh");
+  hubBlock.style.display="none"; hubBlock.innerHTML="";
+  if(state.view.type==="master"){
+    crumb.innerHTML=`<span>Warehouse</span> › <span style="color:var(--master)">Master Warehouse</span>`;
+    title.className="pagetitle master";
+    title.innerHTML=`<div class="bgico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/><path d="M3 8h18"/></svg></div>
+      <div><h2>Master Warehouse</h2><div class="desc"><span>Combined inventory across all ${PEOPLE.length} vans · ${MARKET_ORDER.length} regional hubs</span></div></div>`;
+    $("#st1k").textContent="Total SKUs"; $("#stUnitsSub").textContent=`across ${PEOPLE.length} vans`;
+    qtyTh.firstChild.textContent="Total Qty ";
+  } else if(state.view.type==="hub"){
+    const m=state.view.market, ppl=peopleInMarket(m);
+    crumb.innerHTML=`<span>Regional Hubs</span> › <span style="color:var(--hub)">${esc(m)} Hub</span> · <a onclick="go('master')">Master Warehouse ↗</a>`;
+    title.className="pagetitle hub";
+    title.innerHTML=`<div class="bgico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="1" y="6" width="14" height="12" rx="1.5"/><path d="M15 9h3.5L23 13v4h-8"/><circle cx="6" cy="18.5" r="2"/><circle cx="18" cy="18.5" r="2"/></svg></div>
+      <div><h2>${esc(m)} Regional Hub</h2><div class="desc"><span class="chip mkt">${esc(m)}</span><span>${ppl.length} vans in hub</span></div></div>`;
+    $("#st1k").textContent="Total SKUs"; $("#stUnitsSub").textContent=`across ${ppl.length} hub vans`;
+    qtyTh.firstChild.textContent="Hub Qty ";
+    // link card to master + van cards
+    hubBlock.style.display="block";
+    hubBlock.innerHTML=`
+      <div class="linkcard" onclick="go('master')">
+        <div class="lic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/><path d="M3 8h18"/></svg></div>
+        <div><div class="lt">View Master Warehouse</div><div class="ls">This hub's vans roll up into the combined master inventory.</div></div>
+        <div class="larr"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      </div>
+      <div class="sectit"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="1" y="6" width="14" height="12" rx="1.5"/><path d="M15 9h3.5L23 13v4h-8"/><circle cx="6" cy="18.5" r="2"/><circle cx="18" cy="18.5" r="2"/></svg></span>Vans in this hub<span class="ln"></span></div>
+      <div class="vangrid">${ppl.map(vanCardHTML).join("")}</div>
+      <div class="sectit"><span class="ico" style="color:var(--accent2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21V8l9-5 9 5v13"/></svg></span>Combined hub inventory<span class="ln"></span></div>`;
+  } else { // van
+    const p=findPerson(state.view.id);
+    crumb.innerHTML=`<span>Regional Hubs</span> › <a onclick="go('hub',{market:'${esc(p.market)}'})">${esc(p.market)} Hub</a> › <span style="color:var(--accent2)">${esc(p.name)}</span>`;
+    title.className="pagetitle van";
+    title.innerHTML=`<div class="bgico" style="font-family:'JetBrains Mono';font-weight:800;font-size:17px;color:var(--accent2)">${initials(p.name)}</div>
+      <div><h2>${esc(p.name)}</h2><div class="desc">
+        <span class="chip role">${esc(p.title)}</span>
+        <span class="chip mkt">${esc(p.market)}</span>
+        <span class="chip ph">${esc(p.phone)}</span>
+      </div></div>`;
+    $("#st1k").textContent="Total Items"; $("#stUnitsSub").textContent="on this van";
+    qtyTh.firstChild.textContent="Qty ";
+  }
+}
+
+function vanCardHTML(p){
+  const units=state.baseItems.reduce((s,i)=>s+(Number(i.quantity)||0),0);
+  const skus=state.baseItems.length;
+  return `<div class="vancard" onclick="go('van',{id:'${p.id}'})">
+    <div class="vh"><div class="av">${initials(p.name)}</div>
+      <div><div class="vname">${esc(p.name)}</div><div class="vrole">${esc(p.title)}</div></div></div>
+    <div class="vstats">
+      <div class="vstat"><div class="vn">${num(skus)}</div><div class="vl">SKUs</div></div>
+      <div class="vstat"><div class="vn">${num(units)}</div><div class="vl">Units</div></div>
+    </div>
+    <div class="vphone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/></svg>${esc(p.phone)}</div>
+  </div>`;
+}
 
 function render(){
   setStatus();
   $("#refreshBtn").classList.toggle("spin", state.loading);
+  renderChrome();
   const rows=$("#rows"), pagebar=$("#pagebar");
 
   if(state.items.length){
@@ -415,31 +675,27 @@ function render(){
     const toOrder=state.items.filter(i=>i.stockState==="toOrder").length;
     const excess=state.items.filter(i=>i.stockState==="excess").length;
     const masters=state.items.filter(i=>i.isMaster).length;
-    $("#stTotal").textContent = state.pagination ? num(state.pagination.totalCount) : num(state.items.length);
-    $("#stTotalSub").textContent = state.pagination ? `page ${state.pagination.page} of ${state.pagination.totalPages}` : "across all stock";
-    $("#stUnits").textContent = num(units);
-    $("#stValue").textContent = money(value);
-    $("#stOrder").textContent = num(toOrder);
-    $("#stOrderSub").textContent = `${excess} excess · ${masters} master`;
+    $("#stTotal").textContent=num(state.items.length);
+    $("#stTotalSub").textContent="distinct SKUs";
+    $("#stUnits").textContent=num(units);
+    $("#stValue").textContent=money(value);
+    $("#stOrder").textContent=num(toOrder);
+    $("#stOrderSub").textContent=`${excess} excess · ${masters} master`;
   } else if(!state.loading){
     ["stTotal","stUnits","stOrder"].forEach(id=>$("#"+id).textContent="0"); $("#stValue").textContent="$0.00";
-    $("#stTotalSub").textContent="across all stock"; $("#stOrderSub").textContent="at/below reorder min";
   }
 
   if(state.loading){ rows.innerHTML=""; for(let i=0;i<7;i++){ const tr=document.createElement("tr"); tr.style.cursor="default"; tr.innerHTML=`<td colspan="7"><div class="skel"></div></td>`; rows.appendChild(tr); } pagebar.style.display="none"; return; }
   if(state.error){ rows.innerHTML=`<tr style="cursor:default"><td colspan="7">${errorBlock(state.error)}</td></tr>`; pagebar.style.display="none"; return; }
 
   const arr=filteredRows();
-  if(!arr.length){ rows.innerHTML=`<tr style="cursor:default"><td colspan="7">${emptyBlock()}</td></tr>`; drawPager(); return; }
+  if(!arr.length){ rows.innerHTML=`<tr style="cursor:default"><td colspan="7">${emptyBlock()}</td></tr>`; pagebar.style.display="none"; return; }
 
-  rows.innerHTML = arr.map(it=>{
+  rows.innerHTML=arr.map(it=>{
     const sub=[it.brand,it.model].filter(Boolean).join(" · ") || it.location || it.assetFullName || "";
     return `<tr onclick="openItem(${Number(it.assetID)})">
       <td><span class="id">#${esc(it.assetID)}</span></td>
-      <td>
-        <div class="nm">${esc(it.name||it.assetFullName||"Unnamed")} ${it.isMaster?'<span class="tag master">Master</span>':''}</div>
-        ${sub?`<div class="sub">${esc(sub)}</div>`:""}
-      </td>
+      <td><div class="nm">${esc(it.name||it.assetFullName||"Unnamed")} ${it.isMaster?'<span class="tag master">Master</span>':''}</div>${sub?`<div class="sub">${esc(sub)}</div>`:""}</td>
       <td class="hide"><span class="tag type">${esc(it.assetType||"—")}</span></td>
       <td class="hide">${esc(it.department||"—")}</td>
       <td class="r"><span class="qty">${num(it.quantity)}<span class="mm">min ${num(it.minimum)}${it.maximum?` · max ${num(it.maximum)}`:""}</span></span></td>
@@ -447,50 +703,31 @@ function render(){
       <td>${statePill(it.stockState)}</td>
     </tr>`;
   }).join("");
-  drawPager();
+  // simple footer count (client-side, no server pagination since we fetch all)
+  pagebar.style.display="flex";
+  $("#pageInfo").innerHTML=`Showing <b>${num(arr.length)}</b> of <b>${num(state.items.length)}</b> SKUs`;
+  $("#pager").innerHTML="";
 }
-
-function drawPager(){
-  const pg=state.pagination, bar=$("#pagebar"), info=$("#pageInfo"), pager=$("#pager");
-  if(!pg){ bar.style.display="none"; return; }
-  bar.style.display="flex";
-  const start=(pg.page-1)*pg.pageSize+1, end=Math.min(pg.page*pg.pageSize,pg.totalCount);
-  info.innerHTML = pg.totalCount? `Showing <b>${num(start)}–${num(end)}</b> of <b>${num(pg.totalCount)}</b> items` : "No items";
-  pager.innerHTML="";
-  const mk=(label,page,opts={})=>{ const b=document.createElement("button"); b.textContent=label; if(opts.cur)b.classList.add("cur"); b.disabled=!!opts.dis; if(!opts.dis&&!opts.cur)b.onclick=()=>gotoPage(page); return b; };
-  pager.appendChild(mk("‹ Prev", pg.page-1, {dis:pg.page<=1}));
-  const total=pg.totalPages||1, cur=pg.page;
-  let s=Math.max(1,cur-2), e=Math.min(total,s+4); s=Math.max(1,e-4);
-  if(s>1){ pager.appendChild(mk("1",1)); if(s>2) pager.appendChild(mk("…",0,{dis:true})); }
-  for(let p=s;p<=e;p++) pager.appendChild(mk(String(p),p,{cur:p===cur}));
-  if(e<total){ if(e<total-1) pager.appendChild(mk("…",0,{dis:true})); pager.appendChild(mk(String(total),total)); }
-  pager.appendChild(mk("Next ›", pg.page+1, {dis:!pg.hasNextPage}));
-}
-function gotoPage(p){ if(p<1)return; state.page=p; load(); window.scrollTo({top:0,behavior:"smooth"}); }
 
 function emptyBlock(){
-  const filtered = state.search || state.stockState!=="all" || state.assetType;
-  return `<div class="state"><div class="ic">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 8V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/><path d="M1 3h22v5H1z"/></svg></div>
+  const filtered=state.search||state.stockState!=="all"||state.assetType;
+  return `<div class="state"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 8V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/><path d="M1 3h22v5H1z"/></svg></div>
     <h3>${filtered?"No items match":"No inventory returned"}</h3>
-    <p>${filtered?"Try clearing the search or filters to see all items on this page.":"The API responded with an empty list for this page and filter set."}</p></div>`;
+    <p>${filtered?"Try clearing the search or filters.":"The API responded with an empty list."}</p></div>`;
 }
 function errorBlock(err){
   let title,body,hint="";
-  if(err.type==="network"){
-    title="Couldn't reach the API";
-    body="The request failed before getting a response — usually a wrong/unreachable base URL or a CORS restriction from the browser.";
-    hint=`<div class="hint"><b>Try this:</b><br>• Verify the base URL in the connection panel.<br>• Open <code>${esc(buildListUrl())}</code> in a new tab — if it loads there but not here, it's CORS.<br>• <b>CORS fix:</b> route the call through your own backend that holds the key.</div>`;
-  } else if(err.type==="http"){
-    if(err.status===401){ title="401 · Unauthorized"; body="Missing or invalid API key. Confirm the master key in the connection panel — it's sent in the X-Api-Key header."; }
-    else if(err.status===429){ title="429 · Rate limit exceeded"; body="You've hit the limit of 60 requests/minute. Slow down and retry in a moment."; hint=`<div class="hint">Tip: avoid rapid page-flipping or refreshes. The API allows 60 requests/min per key.</div>`; }
-    else if(err.status===404){ title="404 · Not found"; body="Resource not found or not accessible to this account. Check the base URL — /v1/inventory is appended automatically."; }
-    else if(err.status===400){ title="400 · Bad request"; body="Check your query parameters (assetType / stockState values, page bounds)."; }
-    else { title=`${err.status} · Server error`; body="The API returned an error. If it persists, contact OwlOps support with the traceId."; }
-    if(err.body){ const d=err.body.detail||err.body.error||err.body.title; if(d) hint=`<div class="hint"><b>API said:</b> ${esc(d)}${err.body.traceId?`<br><b>traceId:</b> <code>${esc(err.body.traceId)}</code>`:""}</div>`; }
+  if(err.type==="network"){ title="Couldn't reach the API"; body="The request failed before getting a response — usually a wrong/unreachable base URL or a CORS restriction.";
+    hint=`<div class="hint"><b>CORS fix:</b> route the call through your own backend proxy that holds the key (the bundled server.js does this).</div>`; }
+  else if(err.type==="http"){
+    if(err.status===401){ title="401 · Unauthorized"; body="Missing or invalid API key (sent via X-Api-Key header)."; }
+    else if(err.status===429){ title="429 · Rate limit exceeded"; body="Hit the 60 req/min limit. Retry shortly."; }
+    else if(err.status===404){ title="404 · Not found"; body="Resource not found. /v1/inventory is appended automatically."; }
+    else if(err.status===400){ title="400 · Bad request"; body="Check query parameters."; }
+    else { title=`${err.status} · Server error`; body="The API returned an error."; }
+    if(err.body){ const d=err.body.detail||err.body.error||err.body.title; if(d) hint=`<div class="hint"><b>API said:</b> ${esc(d)}</div>`; }
   } else { title="Something went wrong"; body=esc(err.msg||"Unknown error."); }
-  return `<div class="state err"><div class="ic">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+  return `<div class="state err"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
     <h3>${title}</h3><p>${body}</p>${hint}
     <div style="margin-top:18px"><button class="btn pri" onclick="load()">Retry</button>
     <button class="btn" onclick="openSettings()" style="margin-left:8px">Open connection</button></div></div>`;
@@ -498,42 +735,43 @@ function errorBlock(err){
 
 async function openItem(id){
   const scrim=$("#modalScrim"), modal=$("#modal");
+  const vans=vansForView();
   const endpoint=`<span class="get">GET</span> /v1/inventory/${esc(id)}`;
   modal.innerHTML=`<div class="mhead"><div><div class="endpoint">${endpoint}</div><h2>Loading…</h2></div>
     <button class="x" onclick="closeModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
     <div class="mbody"><div class="skel" style="height:60px"></div><div class="skel" style="height:60px;margin-top:12px"></div></div>`;
   scrim.classList.add("open");
-  try{
-    const it = await fetchItem(id);
-    renderDetail(it, endpoint);
-  }catch(e){
-    const err=classifyError(e);
-    modal.querySelector("h2").textContent = err.type==="http" ? `Error ${err.status}` : "Couldn't load item";
-    modal.querySelector(".mbody").innerHTML = errorBlock(err);
-  }
+  try{ const it=await fetchItem(id); renderDetail(scaleItem(it,vans), endpoint, vans); }
+  catch(e){ const err=classifyError(e); modal.querySelector("h2").textContent= err.type==="http"?`Error ${err.status}`:"Couldn't load item"; modal.querySelector(".mbody").innerHTML=errorBlock(err); }
 }
 async function fetchItem(id){
-  const res = await fetch(joinUrl(state.baseUrl,"/v1/inventory/"+encodeURIComponent(id)), {headers:{"Accept":"application/json", ...authHeaders()}});
+  const res=await fetch(joinUrl(state.baseUrl,"/v1/inventory/"+encodeURIComponent(id)), {headers:{"Accept":"application/json",...authHeaders()}});
   if(!res.ok){ let b=null; try{b=await res.json();}catch(_){} throw new HttpError(res.status,b); }
   return await res.json();
 }
-function renderDetail(it, endpoint){
+function viewScope(){
+  if(state.view.type==="master") return `Master · all ${PEOPLE.length} vans`;
+  if(state.view.type==="hub") return `${state.view.market} Hub · ${peopleInMarket(state.view.market).length} vans`;
+  const p=findPerson(state.view.id); return `${p.name} · ${p.market}`;
+}
+function renderDetail(it, endpoint, vans){
   const modal=$("#modal");
-  const F=(label,val,mono)=> `<div class="field"><div class="fl">${label}</div><div class="fv${mono?' mono':''}">${val===""||val==null?'<span style="color:var(--mut)">—</span>':esc(val)}</div></div>`;
+  const F=(label,val,mono)=>`<div class="field"><div class="fl">${label}</div><div class="fv${mono?' mono':''}">${val===""||val==null?'<span style="color:var(--mut)">—</span>':esc(val)}</div></div>`;
+  const scopeNote = vans>1 ? `<div class="warn" style="margin-bottom:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><div>Quantities shown are <b>aggregated across ${vans} vans</b> (${esc(viewScope())}). Per-van base quantity: <b>${num(it.quantity/vans)}</b>.</div></div>` : "";
   modal.innerHTML=`
     <div class="mhead">
-      <div><div class="endpoint">${endpoint}</div><h2>${esc(it.name||it.assetFullName||"Item")} ${it.isMaster?'<span class="tag master" style="vertical-align:middle">Master</span>':''}</h2></div>
+      <div><div class="endpoint">${endpoint} · ${esc(viewScope())}</div><h2>${esc(it.name||it.assetFullName||"Item")} ${it.isMaster?'<span class="tag master" style="vertical-align:middle">Master</span>':''}</h2></div>
       <button class="x" onclick="closeModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
     <div class="mbody">
+      ${scopeNote}
       <div style="margin-bottom:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-        ${statePill(it.stockState)}
-        <span class="tag type">${esc(it.assetType||"—")}</span>
+        ${statePill(it.stockState)}<span class="tag type">${esc(it.assetType||"—")}</span>
         <span class="qty" style="margin-left:auto">${num(it.quantity)} ${esc(it.unitOfMeasure||"")} <span style="color:var(--mut);font-weight:500;font-size:12px">on hand</span></span>
       </div>
       <div class="dgrid">
         ${F("Asset ID","#"+it.assetID,true)}
-        ${F("QR Code ID", it.qrCodeID? "#"+it.qrCodeID : "", true)}
+        ${F("QR Code ID", it.qrCodeID?"#"+it.qrCodeID:"", true)}
         ${F("Full name", it.assetFullName)}
         ${F("Department", it.department)}
         ${F("Location", [it.location,it.location2].filter(Boolean).join(" / "))}
@@ -564,23 +802,23 @@ function syncAssetTypeSelect(){
 
 function openSettings(){ $("#settingsScrim").classList.add("open"); }
 function closeSettings(){ $("#settingsScrim").classList.remove("open"); }
-function connect(){ state.page=1; closeSettings(); load(); }
+function connect(){ closeSettings(); load(); }
+function toggleSide(open){ const s=$("#side"), b=$("#sideback"); const on = open===undefined? !s.classList.contains("open") : open; s.classList.toggle("open",on); b.classList.toggle("open",on); }
 
 let searchTimer;
 $("#search").addEventListener("input", e=>{ state.search=e.target.value; clearTimeout(searchTimer); searchTimer=setTimeout(render,120); });
-$("#stockSeg").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b)return; state.stockState=b.dataset.s; [...e.currentTarget.children].forEach(c=>c.classList.toggle("on",c===b)); state.page=1; load(); });
-$("#assetTypeSel").addEventListener("change", e=>{ state.assetType=e.target.value; state.page=1; load(); });
-$("#pageSizeSel").addEventListener("change", e=>{ state.pageSize=Number(e.target.value); state.page=1; load(); });
+$("#stockSeg").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b)return; state.stockState=b.dataset.s; [...e.currentTarget.children].forEach(c=>c.classList.toggle("on",c===b)); render(); });
+$("#assetTypeSel").addEventListener("change", e=>{ state.assetType=e.target.value; render(); });
 document.querySelectorAll("thead th[data-k]").forEach(th=>th.addEventListener("click", ()=>{
   const k=th.dataset.k;
   if(state.sortKey===k) state.sortDir=state.sortDir==="asc"?"desc":"asc";
   else { state.sortKey=k; state.sortDir=(k==="quantity"||k==="unitCost")?"desc":"asc"; }
   document.querySelectorAll("thead th .ar").forEach(a=>a.textContent="");
-  th.querySelector(".ar").textContent = state.sortDir==="asc"?"▲":"▼";
-  render();
+  th.querySelector(".ar").textContent= state.sortDir==="asc"?"▲":"▼"; render();
 }));
-document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeModal(); closeSettings(); } });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeModal(); closeSettings(); toggleSide(false); } });
 
+markNav();
 load();
 </script>
 </body>
